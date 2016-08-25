@@ -133,7 +133,7 @@
 										<div class="input-group">
 											<span class="input-group-btn">
 												<span class="btn btn-info btn-file">Selectionner&hellip;
-													<input id="file_fw" type="file" name="update"></input>
+													<input id="file_fw" type="file" name="update">
 												</span>
 											</span>
 											<input id="txt_upload_fw" type="text" size="32" class="form-control" placeholder="Aucun fichier .cpp.bin ou .spiffs.bin choisi" readonly>
@@ -145,7 +145,6 @@
 								  </div>
 								</form>
 							</div>
-							</p>
 							<div id='pgfw' class='hide'>
 								<span id='sfw' style="float:left;width:18ex;text-align:center;"></span>
 								<div class="progress">
@@ -1055,10 +1054,28 @@
 
 				// enlever le loader, tout est prêt
 				$('body').addClass('loaded');
+
+				// Affiche l'écran gestion des zones au démarrage
+				$('.nav-tabs a[href="#tab_fp"]').tab('show')
 			}
 
 			$('#btn_test').click(function(){ waitReboot(); });
-
+			
+			// Cache le menu au démarrage (sauf "Zones")
+			var children = $("#myTab").children();
+			$(children[0]).hide();
+			$(children[1]).hide();
+			$(children[2]).hide();
+			$(children[3]).hide();			
+			
+			// Rend le menu visible sur double clique (dessous le menu)
+			$( "#tab_fp" ).dblclick(function() {
+                $(children[0]).show();
+                $(children[1]).show();
+                $(children[2]).show();
+                $(children[3]).show();			
+			});
+			
 		</script>
 		<div id="loader-wrapper">
 			<div id="loader"></div>
