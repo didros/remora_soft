@@ -190,7 +190,6 @@ dispatcher.onError(function(req, res) {
 	var query = url_parts.query;
 	var contentType ;
 
- 	//console.log("In dispatcher.onError");
  	//console.log(util.inspect({query: query}));
 
 		// Check first Query posted http://ip/?toto=titi
@@ -294,12 +293,12 @@ dispatcher.onGet("/sensors", function(req, res) {
       res.end(JSON.stringify(sensors()));
 });    
 
-dispatcher.onGet("/system.json", function(req, res) {
+dispatcher.onGet("/system", function(req, res) {
 			//console.log('s[0]=' + util.inspect(system[0], false, null));
 			//system[0].va = ((Date.now()-startTime)/1000).toFixed(0);
 			//system[1].va = humanSize(os.freemem());
-	  res.writeHead(200, {"Content-Type": "text/json"});
-	  res.end(JSON.stringify(system()));
+      res.writeHead(200, {"Content-Type": "text/json"});
+      res.end(JSON.stringify(system()));
 });    
 
 dispatcher.onGet("/spiffs", function(req, res) {
