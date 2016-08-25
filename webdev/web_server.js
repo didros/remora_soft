@@ -293,7 +293,7 @@ dispatcher.onGet("/sensors", function(req, res) {
       res.end(JSON.stringify(sensors()));
 });    
 
-dispatcher.onGet("/system", function(req, res) {
+dispatcher.onGet("/system.json", function(req, res) {
 			//console.log('s[0]=' + util.inspect(system[0], false, null));
 			//system[0].va = ((Date.now()-startTime)/1000).toFixed(0);
 			//system[1].va = humanSize(os.freemem());
