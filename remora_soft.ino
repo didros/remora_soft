@@ -50,6 +50,7 @@
   #include <ESP8266mDNS.h>
   #include <WiFiUdp.h>
   #include <ArduinoOTA.h>
+  #include <Updater.h>
   #include <Wire.h>
   #include <SPI.h>
   #include <Ticker.h>
@@ -559,6 +560,7 @@ void mysetup()
     server.on("/update", HTTP_POST, 
       // handler once file upload finishes
       [&]() {
+        DebuglnF("Rebooting ...");
         server.sendHeader("Connection", "close");
         server.sendHeader("Access-Control-Allow-Origin", "*");
         server.send(200, "text/plain", (Update.hasError())?"FAIL":"OK");
@@ -567,18 +569,28 @@ void mysetup()
       // handler for upload, get's the sketch bytes, 
       // and writes them through the Update object
       [&]() {
+        int update_type; // FLASH or SPIFFS
         HTTPUpload& upload = server.upload();
 
         if(upload.status == UPLOAD_FILE_START) {
           uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
           WiFiUDP::stopAll();
-          Debugf("Update: %s\n", upload.filename.c_str());
           LedRGBON(COLOR_MAGENTA);
           ota_blink = true;
+          // Check wether it's file system SPIFFS update or firmware FLASH
+          // if the filename conatins "spiffs" (not very robust though)
+          if ( strstr(upload.filename.c_str(),"spiffs") ) {
+            update_type = U_SPIFFS;
+            Debugf("Update SPIFFS: %s\r\n", upload.filename.c_str());
+          }
+          else {
+            update_type = U_FLASH;
+            Debugf("Update firmware: %s\r\n", upload.filename.c_str());
+          }
 
           //start with max available size
-          if(!Update.begin(maxSketchSpace)) 
-            Update.printError(Serial1);
+          if(!Update.begin(maxSketchSpace, update_type)) 
+            Update.printError(Serial);
 
         } else if(upload.status == UPLOAD_FILE_WRITE) {
           if (ota_blink) {
@@ -589,14 +601,14 @@ void mysetup()
           ota_blink = !ota_blink;
           Debug(".");
           if(Update.write(upload.buf, upload.currentSize) != upload.currentSize) 
-            Update.printError(Serial1);
+            Update.printError(Serial);
 
         } else if(upload.status == UPLOAD_FILE_END) {
           //true to set the size to the current progress
           if(Update.end(true)) {
-            Debugf("Update Success: %u\nRebooting...\n", upload.totalSize);
+            Debugf("\r\nUpdate Success: %u\r\n", upload.totalSize);
           } else {
-            Update.printError(Serial1);
+            Update.printError(Serial);
           }
 
           LedRGBOFF();
