@@ -607,6 +607,7 @@ void mysetup()
           //true to set the size to the current progress
           if(Update.end(true)) {
             Debugf("\r\nUpdate Success: %u\r\n", upload.totalSize);
+            DebuglnF("Need reboot (should occur now) ...");
           } else {
             Update.printError(Serial);
           }
